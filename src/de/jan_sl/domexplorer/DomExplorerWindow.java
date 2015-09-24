@@ -103,7 +103,6 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		try { this.getContentPane().remove(scrollView); } catch (NullPointerException ex) {	}
 		
 		this.treeView = new JTree(root);
-		this.treeView.setRootVisible(false);
 		this.scrollView = new JScrollPane(this.treeView);
 		this.getContentPane().add(this.scrollView);
 		this.pack();
