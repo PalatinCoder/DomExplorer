@@ -15,14 +15,16 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 	RenderingWindow renderingWindow;
 	IoOperations ioManager;
 	DomParser domParser;
+	boolean shouldRender;
 	
 	/**
 	 * empty constructor
 	 */
 	public ProgramController(boolean shouldRender) {
-		ioManager = new IoOperations();
-		domExplorerWindow = new DomExplorerWindow(this);
-		domParser = new DomParser(this, domExplorerWindow);
+		this.ioManager = new IoOperations();
+		this.domExplorerWindow = new DomExplorerWindow(this);
+		this.domParser = new DomParser(this, domExplorerWindow);
+		this.shouldRender = shouldRender;
 	}
 
 	@Override
@@ -33,6 +35,7 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 	@Override
 	public void domTreeFinished(DefaultMutableTreeNode page) {
 		domExplorerWindow.setDomTree(page);
+		if (shouldRender) renderingWindow = new RenderingWindow(page);
 	}
 
 	@Override
