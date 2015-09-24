@@ -90,8 +90,7 @@ public class DomParser implements IPageLoaded {
 			}
 			
 			// remove parsed text
-			// TODO hier wird manchmal zu viel gelöscht....
-			//markup = markup.delete(0, nextTag);
+			markup = markup.delete(0, nextTag);
 			
 			// - deleted - if (!currentIsClosingTag) end = -1;
 		
@@ -131,7 +130,7 @@ public class DomParser implements IPageLoaded {
 			parent.add(node);
 			
 			// remove parsed markup
-			markup = markup.delete(0, end);
+			markup = markup.delete(0, markup.indexOf(">")+1);
 		
 			// parse children and add them to current node
 			// if tag contains "/>", it is self closing. meta & link must not have children
