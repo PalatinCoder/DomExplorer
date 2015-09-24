@@ -1,8 +1,8 @@
 package de.jan_sl.domexplorer;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,7 +19,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Administrator
  *
  */
-public class ViewWindow extends JFrame implements java.awt.event.KeyListener, java.awt.event.ActionListener, IDomParser, IWindowStatusBar {
+public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -28,7 +28,6 @@ public class ViewWindow extends JFrame implements java.awt.event.KeyListener, ja
 	/**
 	 * @see de.jan_sl.domexplorer.domparser
 	 */
-	DomParser domParser = new DomParser(this);
 	
 	private JPanel topPanel;
 	private JTextPane statusBar;
@@ -38,17 +37,19 @@ public class ViewWindow extends JFrame implements java.awt.event.KeyListener, ja
 	private JScrollPane scrollView;
 	
 	/**
-	 * Create the window
+	 * Create the domExplorerWindow
 	 */
-	public ViewWindow() {
+	public DomExplorerWindow(Object actionListener) {
 		topPanel = new JPanel();
 		
 		urlBar = new JTextField(20);
-		urlBar.addKeyListener(this);
+		urlBar.addKeyListener((KeyListener) actionListener);
+		urlBar.setName("urlBar");
 		topPanel.add(urlBar);
 		
 		buttonLoad = new JButton("Laden");
-		buttonLoad.addActionListener(this);
+		buttonLoad.addActionListener((ActionListener) actionListener);
+		buttonLoad.setName("buttonLoad");
 		topPanel.add(buttonLoad);
 		
 		statusBar = new JTextPane();
@@ -65,60 +66,12 @@ public class ViewWindow extends JFrame implements java.awt.event.KeyListener, ja
 		this.setVisible(true);
 		
 		// TODO DEBUG
-		//this.urlBar.setText("jan-sl.de");
+		//this.urlBar.setText("file:///c:/jan-sl.htm");
 		//loadPage();
 		// END DEBUG
 	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-	 */
-	@Override
-	public void keyPressed(KeyEvent e) {
-		switch (e.getKeyCode()) {
-			case KeyEvent.VK_ENTER:
-				loadPage();
-				break;
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
-	@Override
-	public void keyReleased(KeyEvent e) {		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
-	@Override
-	public void keyTyped(KeyEvent e) {		
-	}
-
-	/* (non-Javadoc)
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == this.buttonLoad) loadPage();
-	}
 	
-	/**
-	 * Builds the url from the textbox and starts loading the page
-	 */
-	private void loadPage() {
-		String url = urlBar.getText();
-		this.statusBar.setText("Request " + url);
-		
-		try { 
-			this.getContentPane().remove(scrollView);
-			this.repaint();
-		} catch(NullPointerException ex) {}
-		
-		ioManager.requestIo(domParser, this, url);
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.jan_sl.domexplorer.IWindowStatusBar#addStatusBarText(java.lang.String)
 	 */
@@ -126,12 +79,16 @@ public class ViewWindow extends JFrame implements java.awt.event.KeyListener, ja
 	public void addStatusBarText(String msg) {
 		this.statusBar.setText(this.statusBar.getText() + " | " + msg);
 	}
+	
+	public void setStatusBarText(String msg) {
+		this.statusBar.setText(msg);
+	}
 
-	/* (non-Javadoc)
+	/**
+	 * Set the parsed DOM Tree
 	 * @see de.jan_sl.domexplorer.IDomParser#setDomTree(javax.swing.tree.DefaultMutableTreeNode)
 	 */
-	@Override
-	public void setDomTree(DefaultMutableTreeNode root) {
+	protected void setDomTree(DefaultMutableTreeNode root) {
 		
 		try { this.getContentPane().remove(scrollView); } catch (NullPointerException ex) {	}
 		
@@ -140,5 +97,10 @@ public class ViewWindow extends JFrame implements java.awt.event.KeyListener, ja
 		this.scrollView = new JScrollPane(this.treeView);
 		this.getContentPane().add(this.scrollView);
 		this.pack();
+	}
+
+
+	protected String getUrl() {
+		return this.urlBar.getText();
 	}
 }

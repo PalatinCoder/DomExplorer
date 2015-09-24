@@ -5,8 +5,6 @@ import java.util.Iterator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-
-
 /**
  * @author Administrator
  *
@@ -15,16 +13,21 @@ public class DomParser implements IPageLoaded {
 	/**
 	 * @see de.jan_sl.domexplorer.IDomParser
 	 */
-	private IDomParser listener;
+	private IDomParser domListener;
+	private IWindowStatusBar statusBarDelegate;
 
 
 	/**
-	 * Constructor. Needs the IDomParser delegate
-	 * @param delegate
+	 * Constructor
+	 * @param domListener The listener for the parsed DOM
+	 * @param statusBarDelegate Delegate to send status bar messages to
+	 * 
+	 * @see de.jan_sl.domexplorer.IWindowStatusBar
 	 * @see de.jan_sl.domexplorer.IDomParser
 	 */
-	public DomParser(IDomParser delegate) {
-		this.listener = delegate;
+	public DomParser(IDomParser domListener, IWindowStatusBar statusBarDelegate) {
+		this.domListener = domListener;
+		this.statusBarDelegate = statusBarDelegate;
 	}
 
 
@@ -39,7 +42,7 @@ public class DomParser implements IPageLoaded {
 		
 		nextDomNode(new StringBuilder(markup), root);
 		
-		listener.setDomTree(root);
+		domListener.domTreeFinished(root);
 	}
 	
 	private void nextDomNode(StringBuilder markup, DefaultMutableTreeNode parent) {
@@ -54,7 +57,7 @@ public class DomParser implements IPageLoaded {
 	private void nextDomNode(StringBuilder markup, DefaultMutableTreeNode parent, int debugRecursionDepth, String currentOpenTag) {
 		
 		// TODO debug
-		System.out.println("debugRecursionDepth: " + debugRecursionDepth + ", called with markup " + markup);
+		//System.out.println("debugRecursionDepth: " + debugRecursionDepth + ", called with markup " + markup);
 		// end debug
 		
 		int start;
@@ -69,7 +72,7 @@ public class DomParser implements IPageLoaded {
 		if (start > end) isInsideTag = true;
 		
 		sCurrentTag = markup.substring(isInsideTag ? 0 : start, end-1);
-		String currentTagName;
+		String currentTagName = "";
 		HashMap<String, String> currentTagAttributes = new HashMap<String, String>();
 		
 		boolean currentIsComment = sCurrentTag.startsWith("!");
@@ -80,22 +83,22 @@ public class DomParser implements IPageLoaded {
 		// parse text between tags
 		
 		if (!isInsideTag && !currentIsComment) {
-		
+
 			int nextTag = markup.indexOf("<");
 			String textNode = new String();
-			
+
 			if (nextTag > 0) textNode = markup.substring(0, nextTag);
+
 			if (!textNode.isEmpty() && !textNode.matches("\\s+")) {				
 				parent.add(new DefaultMutableTreeNode(textNode));
 			}
-			
+
 			// remove parsed text
 			markup = markup.delete(0, nextTag);
-			
+
 			// - deleted - if (!currentIsClosingTag) end = -1;
-		
 		}
-		
+
 		// handle opening tags
 		if (!currentIsComment && !currentIsClosingTag) {
 			
@@ -164,12 +167,20 @@ public class DomParser implements IPageLoaded {
 		
 		// handle closing tags
 		if (currentIsClosingTag && markup.length() > 1) {
+			if (!sCurrentTag.equals("/" + currentOpenTag)) {
+				// TODO compensate unclosed tag
+				statusBarDelegate.addStatusBarText("ERROR: " + currentOpenTag + " was not closed");
+			}
 			// remove parsed end tag
 			markup = markup.delete(0, markup.indexOf(">")+1);
 			if(debugRecursionDepth > 0) return;
 		}
 		
 		// call again until markup is completely parsed
-		if (markup.length() > 1 && markup.indexOf("<") >= 0) nextDomNode(markup.delete(0, end+1), parent, debugRecursionDepth, currentOpenTag);
+		if (markup.length() > 1 && markup.indexOf("<") >= 0) {
+			nextDomNode(markup.delete(0, end+1), parent, debugRecursionDepth, currentOpenTag);
+		} else {
+			if (debugRecursionDepth > 0) statusBarDelegate.addStatusBarText("ERROR: Markup contains errors");
+		}
 	}
 }

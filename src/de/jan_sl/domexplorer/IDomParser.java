@@ -12,5 +12,5 @@ public interface IDomParser {
 	 * Sets the DOM TreeNode Object in the UI
 	 * @param page The complete DOM Tree
 	 */
-	public void setDomTree(DefaultMutableTreeNode page);
+	public void domTreeFinished(DefaultMutableTreeNode page);
 }
