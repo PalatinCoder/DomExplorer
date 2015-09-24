@@ -3,8 +3,9 @@
  */
 package de.jan_sl.domexplorer;
 
+import java.util.Enumeration;
+
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -23,11 +24,24 @@ public class RenderingWindow extends JFrame {
 	 * create the window
 	 * @param pageTree the page tree from the dom parser
 	 */
-	public RenderingWindow(DefaultMutableTreeNode pageTree) {
-		this.getContentPane().add(new JLabel("Hallo welt"));
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+	public RenderingWindow() {
 		this.setLocationByPlatform(true);
-		this.pack();
+		this.setSize(800,600);
+		this.setVisible(false);	
+	}
+	
+	public void render(DefaultMutableTreeNode pageTree) {
+		@SuppressWarnings("unchecked")
+		Enumeration<DefaultMutableTreeNode> en = pageTree.preorderEnumeration();
+		
+		while (en.hasMoreElements()) {
+			interpretNode(en.nextElement());
+		}
+		
 		this.setVisible(true);
+	}
+
+	private void interpretNode(DefaultMutableTreeNode currentNode) {
+		if (currentNode.getLevel() > 0 && currentNode.getParent().toString().equals("title")) this.setTitle(currentNode.toString().trim());
 	}
 }

@@ -1,8 +1,17 @@
 package de.jan_sl.domexplorer;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import javax.swing.JFileChooser;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -13,29 +22,62 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 	
 	DomExplorerWindow domExplorerWindow;
 	RenderingWindow renderingWindow;
+	TextRenderer textRenderer;
 	IoOperations ioManager;
 	DomParser domParser;
-	boolean shouldRender;
+	
+	DefaultMutableTreeNode page = null;
 	
 	/**
 	 * empty constructor
 	 */
-	public ProgramController(boolean shouldRender) {
+	public ProgramController() {
+		String lastPage = null;
+		try {
+			lastPage = new String(Files.readAllBytes(Paths.get("./last-visited")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		this.ioManager = new IoOperations();
 		this.domExplorerWindow = new DomExplorerWindow(this);
 		this.domParser = new DomParser(this, domExplorerWindow);
-		this.shouldRender = shouldRender;
+		
+		if (lastPage != null) this.domExplorerWindow.setUrl(lastPage);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Laden")) loadPage();
+		switch (((Component) e.getSource()).getName()) {
+		case "buttonLoad":
+			loadPage();			
+			break;
+		case "buttonSave":
+			if (page == null) break;
+			
+			JFileChooser fileChooser = new JFileChooser();
+			int res = fileChooser.showSaveDialog(domExplorerWindow);
+			if (res == JFileChooser.APPROVE_OPTION) {
+				this.textRenderer = new TextRenderer(fileChooser.getSelectedFile().getAbsolutePath(), domExplorerWindow);
+				this.textRenderer.render(this.page);
+			}
+			break;
+		case "buttonDraw":
+			if (page == null) break;
+			
+			this.renderingWindow = new RenderingWindow();
+			this.renderingWindow.render(this.page);
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override
 	public void domTreeFinished(DefaultMutableTreeNode page) {
 		domExplorerWindow.setDomTree(page);
-		if (shouldRender) renderingWindow = new RenderingWindow(page);
+		this.page = page;
 	}
 
 	@Override
@@ -62,6 +104,20 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 			domExplorerWindow.setStatusBarText("Request " + url);
 			ioManager.requestIo(domParser, domExplorerWindow, url);
 		}
+		
+		// save last opened page
+		File lastPage = new File("./last-visited");
+		PrintWriter writer = null;
+		try {
+			if (!lastPage.exists()) lastPage.createNewFile();
+			writer = new PrintWriter( new BufferedWriter( new FileWriter(lastPage)));
+			writer.write(url);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (writer != null) writer.close();
+		}
+		
 	}
 
 }

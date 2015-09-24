@@ -32,7 +32,7 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 	private JPanel topPanel;
 	private JTextPane statusBar;
 	private JTextField urlBar;
-	private JButton buttonLoad;
+	private JButton buttonLoad, buttonSave, buttonDraw;
 	private JTree treeView;
 	private JScrollPane scrollView;
 	
@@ -47,10 +47,20 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		urlBar.setName("urlBar");
 		topPanel.add(urlBar);
 		
-		buttonLoad = new JButton("Laden");
+		buttonLoad = new JButton("Seite laden");
 		buttonLoad.addActionListener((ActionListener) actionListener);
 		buttonLoad.setName("buttonLoad");
 		topPanel.add(buttonLoad);
+		
+		buttonSave = new JButton("Struktur speichern");
+		buttonSave.addActionListener((ActionListener) actionListener);
+		buttonSave.setName("buttonSave");
+		topPanel.add(buttonSave);
+		
+		buttonDraw = new JButton("Struktur zeichnen");
+		buttonDraw.addActionListener((ActionListener) actionListener);
+		buttonDraw.setName("buttonDraw");
+		topPanel.add(buttonDraw);
 		
 		statusBar = new JTextPane();
 		statusBar.setAlignmentX(LEFT_ALIGNMENT);
@@ -62,7 +72,7 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setTitle("DOM Explorer");
-		this.setSize(500,500);
+		this.pack();
 		this.setVisible(true);
 		
 		// TODO DEBUG
@@ -102,5 +112,8 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 
 	protected String getUrl() {
 		return this.urlBar.getText();
+	}
+	protected void setUrl(String text) {
+		this.urlBar.setText(text);
 	}
 }
