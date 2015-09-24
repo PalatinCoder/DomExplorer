@@ -36,7 +36,6 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 		try {
 			lastPage = new String(Files.readAllBytes(Paths.get("./last-visited")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
