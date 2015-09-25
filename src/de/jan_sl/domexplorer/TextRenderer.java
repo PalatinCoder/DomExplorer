@@ -3,11 +3,9 @@
  */
 package de.jan_sl.domexplorer;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Enumeration;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -45,12 +43,11 @@ public class TextRenderer {
 		
 		@SuppressWarnings("unchecked")
 		Enumeration<DefaultMutableTreeNode> en = pageTree.preorderEnumeration();
-		PrintWriter writer = null;
 		
 		try {
 			if (!file.exists()) file.createNewFile();
 			
-			writer = new PrintWriter(new BufferedWriter( new FileWriter(this.file)));
+			FileWriter writer = new FileWriter(this.file);
 
 			while (en.hasMoreElements()) {
 				DefaultMutableTreeNode node = en.nextElement();
@@ -59,14 +56,11 @@ public class TextRenderer {
 				
 				writer.write(intendation + node.toString().trim() + eol);
 			}
+			
+			writer.close();
 		} catch (IOException e) {
 			this.statusBarDelegate.addStatusBarText("ERROR: IOException: " + e.getMessage());
 			e.printStackTrace();
-		} finally {
-			if (writer != null) {
-				writer.close();
-				this.statusBarDelegate.addStatusBarText("File written sucessfully");
-			}
 		}
 	}
 }

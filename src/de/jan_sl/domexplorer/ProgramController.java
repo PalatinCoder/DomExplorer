@@ -3,11 +3,9 @@ package de.jan_sl.domexplorer;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -113,17 +111,14 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 		
 		// save last opened page
 		File lastPage = new File("./last-visited");
-		PrintWriter writer = null;
 		try {
 			if (!lastPage.exists()) lastPage.createNewFile();
-			writer = new PrintWriter( new BufferedWriter( new FileWriter(lastPage)));
+			FileWriter writer = new FileWriter(lastPage);
 			writer.write(url);
+			writer.close();
 		} catch (IOException ex) {
 			ex.printStackTrace();
-		} finally {
-			if (writer != null) writer.close();
 		}
-		
 	}
 
 }
