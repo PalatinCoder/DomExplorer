@@ -14,6 +14,9 @@ public class DomParser implements IPageLoaded {
 	 * @see de.jan_sl.domexplorer.IDomParser
 	 */
 	private IDomParser domListener;
+	/**
+	 * @see de.jan_sl.domexplorer.IWindowStatusBar
+	 */
 	private IWindowStatusBar statusBarDelegate;
 
 
@@ -45,6 +48,13 @@ public class DomParser implements IPageLoaded {
 		domListener.domTreeFinished(root);
 	}
 	
+	/**
+	 * Overloading the actual method with less parameters.
+	 * @param markup The complete markup
+	 * @param parent the parent tree node
+	 * 
+	 * @see de.jan_sl.domexplorer.DomParser#nextDomNode(StringBuilder, DefaultMutableTreeNode, int, String)
+	 */
 	private void nextDomNode(StringBuilder markup, DefaultMutableTreeNode parent) {
 		this.nextDomNode(markup, parent, 0, new String());
 	}
@@ -53,12 +63,10 @@ public class DomParser implements IPageLoaded {
 	 * Parses the markup tag by tag, child nodes via recursion
 	 * @param markup The complete markup of the page
 	 * @param parent The parent TreeNode in the DOM Tree
+	 * @param recursionDepth the current recursion depth
+	 * @param currentOpenTag the tag which is currently open, telling which closing tag we're looking for
 	 */
-	private void nextDomNode(StringBuilder markup, DefaultMutableTreeNode parent, int debugRecursionDepth, String currentOpenTag) {
-		
-		// TODO debug
-		//System.out.println("debugRecursionDepth: " + debugRecursionDepth + ", called with markup " + markup);
-		// end debug
+	private void nextDomNode(StringBuilder markup, DefaultMutableTreeNode parent, int recursionDepth, String currentOpenTag) {
 		
 		int start;
 		int end;
@@ -138,7 +146,7 @@ public class DomParser implements IPageLoaded {
 			// parse children and add them to current node
 			// if tag contains "/>", it is self closing. meta & link must not have children
 			if (!(currentTagName.matches("meta|br|link|img") || sCurrentTag.contains("/>"))) {
-				nextDomNode(markup, node, debugRecursionDepth+1, currentTagName);
+				nextDomNode(markup, node, recursionDepth+1, currentTagName);
 			}
 			
 		}
@@ -175,14 +183,14 @@ public class DomParser implements IPageLoaded {
 			}
 			// remove parsed end tag
 			if (!dontDelete) markup = markup.delete(0, markup.indexOf(">")+1);
-			if(debugRecursionDepth > 0) return;
+			if(recursionDepth > 0) return;
 		}
 		
 		// call again until markup is completely parsed
 		if (markup.length() > 1 && markup.indexOf("<") >= 0) {
-			nextDomNode(markup.delete(0, end+1), parent, debugRecursionDepth, currentOpenTag);
+			nextDomNode(markup.delete(0, end+1), parent, recursionDepth, currentOpenTag);
 		} else {
-			if (debugRecursionDepth > 0) statusBarDelegate.addStatusBarText("ERROR: Markup contains errors");
+			if (recursionDepth > 0) statusBarDelegate.addStatusBarText("ERROR: Markup contains errors");
 		}
 	}
 }

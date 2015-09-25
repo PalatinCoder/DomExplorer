@@ -10,7 +10,7 @@ package de.jan_sl.domexplorer;
 public class ProgramLoader {
 
 	/**
-	 * @param args -showOutline render an outline of the given DOM
+	 * @param args Commandline arguments. there are none
 	 */
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {

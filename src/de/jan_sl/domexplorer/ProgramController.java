@@ -15,6 +15,8 @@ import javax.swing.JFileChooser;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
+ * This class controls the program.
+ * It dispatches every action and is listener for all GUI events
  * @author Administrator
  *
  */
@@ -29,7 +31,8 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 	DefaultMutableTreeNode page = null;
 	
 	/**
-	 * empty constructor
+	 * Constructor, actual Program entry point
+	 * It initializes all components (view, ioManager, parser) and reads the last visited url
 	 */
 	public ProgramController() {
 		String lastPage = null;
@@ -95,6 +98,10 @@ public class ProgramController implements java.awt.event.ActionListener, java.aw
 	public void keyTyped(KeyEvent e) {
 	}
 	
+	/**
+	 * start loading the page.
+	 * The method request an IO Operation via ioManager and saves the last visited url to a file
+	 */
 	public void loadPage() {
 		String url = domExplorerWindow.getUrl();
 		if (url.isEmpty()) {

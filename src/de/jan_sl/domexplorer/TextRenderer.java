@@ -18,14 +18,27 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  */
 public class TextRenderer {
-	File file;;
+	/**
+	 * File Object representing the output file
+	 */
+	File file;
 	IWindowStatusBar statusBarDelegate;
 	
+	/**
+	 * Constructor
+	 * @param path The path of the file in which the structure shall be written
+	 * @param statusBarDelegate The statusBarDelegate
+	 * @see de.jan_sl.domexplorer.IWindowStatusBar
+	 */
 	public TextRenderer(String path, IWindowStatusBar statusBarDelegate) {
 		this.statusBarDelegate = statusBarDelegate;
 		this.file = new File(path);
 	}
 	
+	/**
+	 * render the page tree as textual representation, and write to the given file
+	 * @param pageTree The DOM Tree
+	 */
 	public void render(DefaultMutableTreeNode pageTree) {
 		
 		String eol = System.getProperty("line.separator");

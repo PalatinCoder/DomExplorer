@@ -26,9 +26,6 @@ public class RenderingWindow extends JFrame {
 	
 	JScrollPane scrollView = new JScrollPane();
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7588087496824177354L;
 	
 	/**
@@ -44,6 +41,10 @@ public class RenderingWindow extends JFrame {
 		this.setVisible(false);	
 	}
 	
+	/**
+	 * render the page
+	 * @param rootNode the root node of the dom tree
+	 */
 	public void render(DefaultMutableTreeNode rootNode) {
 		
 		DefaultMutableTreeNode head = (DefaultMutableTreeNode) rootNode.getChildAt(0).getChildAt(0);
@@ -62,6 +63,11 @@ public class RenderingWindow extends JFrame {
 		this.setVisible(true);
 	}
 
+	/**
+	 * process a single node. this method is called recursively to process the given node's child nodes
+	 * @param treeNode the node to process
+	 * @param parent the parent GUI component in which the given node shall be displayed
+	 */
 	private void processNode(DefaultMutableTreeNode treeNode, Container parent) {		
 		
 		// create the contentPanel for the element
@@ -73,6 +79,7 @@ public class RenderingWindow extends JFrame {
 		if (!treeNode.toString().trim().matches("body|header|div|nav|article|p|a|h1|h2|h3|h4|\\[.*?")) {
 			Component contentLabel = null;
 			
+			// parse text nodes
 			switch (treeNode.getParent().toString()) {
 			case "a":
 				contentLabel = new JLabel(treeNode.toString().trim());
@@ -93,7 +100,6 @@ public class RenderingWindow extends JFrame {
 			default:
 				contentLabel = new JLabel(treeNode.toString().trim());
 				contentLabel.setFont(new Font("Serif", Font.PLAIN, 16));
-				//((JTextArea) contentLabel).setEditable(false);
 				break;
 			}
 			

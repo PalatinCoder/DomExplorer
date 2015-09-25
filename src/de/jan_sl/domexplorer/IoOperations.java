@@ -49,7 +49,7 @@ public class IoOperations {
 	 * @see de.jan_sl.domexplorer.IPageLoaded
 	 * @see de.jan_sl.domexplorer.IWindowStatusBar
 	 */
-	public void requestHttpGet(IPageLoaded pageLoadedListener, IWindowStatusBar statusBarDelegate, String _url) {
+	private void requestHttpGet(IPageLoaded pageLoadedListener, IWindowStatusBar statusBarDelegate, String _url) {
 		
 		Thread request = new Thread(new Runnable() {
 			
@@ -83,7 +83,16 @@ public class IoOperations {
 
 	}
 	
-	public void requestFile(IPageLoaded pageLoadedListener, IWindowStatusBar statusBarDelegate, String _url) {
+	/**
+	 * Request a file from the local filesystem . The result is passed back via IPageLoaded and IWindowStatusBar is used to display progress.
+	 * @param pageLoadedListener The IPageLoaded delegate to pass the resulting markup to.
+	 * @param statusBarDelegate The IWindowStatusBar delegate to display messages on the UI
+	 * @param _url The url as string
+	 * 
+	 * @see de.jan_sl.domexplorer.IPageLoaded
+	 * @see de.jan_sl.domexplorer.IWindowStatusBar
+	 */
+	private void requestFile(IPageLoaded pageLoadedListener, IWindowStatusBar statusBarDelegate, String _url) {
 		try {
 			List<String> file = Files.readAllLines(Paths.get(_url));
 			StringBuilder builder = new StringBuilder();

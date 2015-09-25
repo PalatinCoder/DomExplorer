@@ -25,10 +25,6 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 
 	IoOperations ioManager = new IoOperations();
 	
-	/**
-	 * @see de.jan_sl.domexplorer.domparser
-	 */
-	
 	private JPanel topPanel;
 	private JTextPane statusBar;
 	private JTextField urlBar;
@@ -77,7 +73,7 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 	}
 	
 
-	/* (non-Javadoc)
+	/**
 	 * @see de.jan_sl.domexplorer.IWindowStatusBar#addStatusBarText(java.lang.String)
 	 */
 	@Override
@@ -85,6 +81,10 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		this.statusBar.setText(this.statusBar.getText() + " | " + msg);
 	}
 	
+	/**
+	 * Set the status bar text
+	 * @param msg The message to show
+	 */
 	public void setStatusBarText(String msg) {
 		this.statusBar.setText(msg);
 	}
@@ -103,11 +103,19 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		this.pack();
 	}
 
-
+	/**
+	 * the url from the text field
+	 * @return String the url
+	 */
 	protected String getUrl() {
 		return this.urlBar.getText();
 	}
-	protected void setUrl(String text) {
-		this.urlBar.setText(text);
+	
+	/**
+	 * Set the url in the text field
+	 * @param url String the url
+	 */
+	protected void setUrl(String url) {
+		this.urlBar.setText(url);
 	}
 }
