@@ -4,8 +4,7 @@
 package de.jan_sl.domexplorer;
 
 import java.awt.Color;
-import java.util.Enumeration;
-
+import java.awt.Container;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 /**
  * This class renders an outline of a given DOM Tree
@@ -21,8 +21,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class RenderingWindow extends JFrame {
 	
-	JScrollPane scrollPane = new JScrollPane();
-	JPanel myContentPane = new JPanel();
+	JScrollPane scrollView = new JScrollPane();
 	
 	/**
 	 * 
@@ -36,40 +35,48 @@ public class RenderingWindow extends JFrame {
 	 * @param pageTree the page tree from the dom parser
 	 */
 	public RenderingWindow() {
-		this.myContentPane.setLayout(new BoxLayout(myContentPane, BoxLayout.PAGE_AXIS));
-		this.scrollPane.add(this.myContentPane);
-		this.getContentPane().add(this.scrollPane);
+		this.getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+		//this.scrollPane.add(this.myContentPane);
+		//this.getContentPane().add(this.scrollPane);
 		this.setLocationByPlatform(true);
 		this.setSize(800,600);
 		this.setVisible(false);	
 	}
 	
-	public void render(DefaultMutableTreeNode pageTree) {	
-		@SuppressWarnings("unchecked")
-		Enumeration<DefaultMutableTreeNode> en = pageTree.preorderEnumeration();
+	public void render(DefaultMutableTreeNode rootNode) {
 		
-		while (en.hasMoreElements()) {
-			processNode(en.nextElement());
-		}
+		System.out.println(rootNode.getChildCount());
 		
+		processNode(rootNode.getChildAt(0), this.scrollView.getViewport());
+		
+		this.getContentPane().add(this.scrollView);
+		this.scrollView.setSize(this.scrollView.getParent().getSize());
 		this.setVisible(true);
 	}
 
-	private void processNode(DefaultMutableTreeNode currentNode) {
-		// grab the title
-		if (currentNode.getLevel() > 0 && currentNode.getParent().toString().equals("title")) this.setTitle(currentNode.toString().trim());
+	private void processNode(TreeNode treeNode, Container parent) {
 		
-		// get body node
-		if (currentNode.toString().equals("body")) this.bodyNode = currentNode;
-		
-		// return if we're not inside the body
-		if (bodyNode == null || !bodyNode.isNodeRelated(currentNode)) return;
-		
-		if (currentNode.toString().matches("header|article|h1|h2|h3|h4|nav|div|p")) {
-			JPanel contentPanel = new JPanel();
-			contentPanel.setBorder(new LineBorder(Color.BLACK));
-			contentPanel.add(new JLabel(currentNode.toString()));
-			this.scrollPane.add(contentPanel); // TODO Components werden nicht angezeigt!
+		String node = treeNode.toString().trim();
+		if (node.length() > 10) {
+			node = node.substring(0, 10);
 		}
+		
+		if (treeNode.getChildCount() == 0) {
+			parent.add(new JLabel(node));
+			return;
+		}
+		
+		JPanel contentPanel = new JPanel();
+		contentPanel.setBorder(new LineBorder(Color.BLACK));
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
+		contentPanel.setSize(parent.getSize());
+		JLabel contentLabel = new JLabel(node);
+		contentPanel.add(contentLabel);
+		
+		for (int i = 0; i < treeNode.getChildCount(); i++) {
+			processNode(treeNode.getChildAt(i), contentPanel);
+		}
+		
+		parent.add(contentPanel);
 	}
 }
