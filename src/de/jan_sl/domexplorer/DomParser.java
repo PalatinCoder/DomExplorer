@@ -167,12 +167,14 @@ public class DomParser implements IPageLoaded {
 		
 		// handle closing tags
 		if (currentIsClosingTag && markup.length() > 1) {
+			boolean dontDelete = false;
+			// if the closing tag is missing, don't delete it
 			if (!sCurrentTag.equals("/" + currentOpenTag)) {
-				// TODO compensate unclosed tag
+				dontDelete = true;
 				statusBarDelegate.addStatusBarText("ERROR: " + currentOpenTag + " was not closed");
 			}
 			// remove parsed end tag
-			markup = markup.delete(0, markup.indexOf(">")+1);
+			if (!dontDelete) markup = markup.delete(0, markup.indexOf(">")+1);
 			if(debugRecursionDepth > 0) return;
 		}
 		
