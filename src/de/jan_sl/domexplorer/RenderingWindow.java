@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
+import java.util.Enumeration;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -45,9 +46,17 @@ public class RenderingWindow extends JFrame {
 	
 	public void render(DefaultMutableTreeNode rootNode) {
 		
-		processNode((DefaultMutableTreeNode) rootNode.getChildAt(0).getChildAt(1), this.scrollView.getViewport());
-		// TODO grab title
-		//if (treeNode.getLevel() > 2 && treeNode.getParent().toString().equals("title")) this.setTitle(treeNode.toString().trim());
+		DefaultMutableTreeNode head = (DefaultMutableTreeNode) rootNode.getChildAt(0).getChildAt(0);
+		DefaultMutableTreeNode body = (DefaultMutableTreeNode) rootNode.getChildAt(0).getChildAt(1);
+		
+		@SuppressWarnings("unchecked")
+		Enumeration<DefaultMutableTreeNode> en = head.preorderEnumeration();
+		while (en.hasMoreElements()) {
+			DefaultMutableTreeNode currentNode = en.nextElement();
+			if (currentNode.toString().equals("title")) this.setTitle(currentNode.getChildAt(0).toString().trim());
+		}
+		
+		processNode(body, this.scrollView.getViewport());
 		
 		this.getContentPane().add(this.scrollView);
 		this.setVisible(true);
@@ -73,8 +82,9 @@ public class RenderingWindow extends JFrame {
 			case "h2":
 			case "h3":
 			case "h4":
+				int size = 24 - 3*(Integer.parseInt(treeNode.getParent().toString().substring(1))-1);
 				contentLabel = new JLabel(treeNode.toString().trim());
-				contentLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+				contentLabel.setFont(new Font("SansSerif", Font.BOLD, size));
 				break;
 			case "p":
 				contentLabel = new JTextArea(treeNode.toString().trim());

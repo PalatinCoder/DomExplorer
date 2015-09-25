@@ -74,11 +74,6 @@ public class DomExplorerWindow extends JFrame implements IWindowStatusBar {
 		this.setTitle("DOM Explorer");
 		this.pack();
 		this.setVisible(true);
-		
-		// TODO DEBUG
-		//this.urlBar.setText("file:///c:/jan-sl.htm");
-		//loadPage();
-		// END DEBUG
 	}
 	
 
