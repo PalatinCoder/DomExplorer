@@ -4,15 +4,17 @@
 package de.jan_sl.domexplorer;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
+import java.awt.Font;
+
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.LineBorder;
+import javax.swing.JTextArea;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
 
 /**
  * This class renders an outline of a given DOM Tree
@@ -27,8 +29,6 @@ public class RenderingWindow extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = -7588087496824177354L;
-
-	DefaultMutableTreeNode bodyNode = null;
 	
 	/**
 	 * create the window
@@ -45,36 +45,54 @@ public class RenderingWindow extends JFrame {
 	
 	public void render(DefaultMutableTreeNode rootNode) {
 		
-		System.out.println(rootNode.getChildCount());
-		
-		processNode(rootNode.getChildAt(0), this.scrollView.getViewport());
+		processNode((DefaultMutableTreeNode) rootNode.getChildAt(0).getChildAt(1), this.scrollView.getViewport());
+		// TODO grab title
+		//if (treeNode.getLevel() > 2 && treeNode.getParent().toString().equals("title")) this.setTitle(treeNode.toString().trim());
 		
 		this.getContentPane().add(this.scrollView);
-		this.scrollView.setSize(this.scrollView.getParent().getSize());
 		this.setVisible(true);
 	}
 
-	private void processNode(TreeNode treeNode, Container parent) {
+	private void processNode(DefaultMutableTreeNode treeNode, Container parent) {		
 		
-		String node = treeNode.toString().trim();
-		if (node.length() > 10) {
-			node = node.substring(0, 10);
-		}
-		
-		if (treeNode.getChildCount() == 0) {
-			parent.add(new JLabel(node));
-			return;
-		}
-		
+		// create the contentPanel for the element
 		JPanel contentPanel = new JPanel();
-		contentPanel.setBorder(new LineBorder(Color.BLACK));
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
-		contentPanel.setSize(parent.getSize());
-		JLabel contentLabel = new JLabel(node);
-		contentPanel.add(contentLabel);
 		
+		// determine if the element text should be rendered, of if it's a tag
+		// \\[.*? means that the string starts with an [, so attributes are filtered
+		if (!treeNode.toString().trim().matches("body|header|div|nav|article|p|a|h1|h2|h3|h4|\\[.*?")) {
+			Component contentLabel = null;
+			
+			switch (treeNode.getParent().toString()) {
+			case "a":
+				contentLabel = new JLabel(treeNode.toString().trim());
+				contentLabel.setForeground(Color.BLUE);
+				break;
+			case "h1":
+			case "h2":
+			case "h3":
+			case "h4":
+				contentLabel = new JLabel(treeNode.toString().trim());
+				contentLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+				break;
+			case "p":
+				contentLabel = new JTextArea(treeNode.toString().trim());
+				((JTextArea) contentLabel).setEditable(false);
+				contentLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+			default:
+				contentLabel = new JLabel(treeNode.toString().trim());
+				contentLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+				//((JTextArea) contentLabel).setEditable(false);
+				break;
+			}
+			
+			if (contentLabel != null) contentPanel.add(contentLabel);
+		}
+		
+		// parse all children 
 		for (int i = 0; i < treeNode.getChildCount(); i++) {
-			processNode(treeNode.getChildAt(i), contentPanel);
+			processNode((DefaultMutableTreeNode) treeNode.getChildAt(i), contentPanel);
 		}
 		
 		parent.add(contentPanel);
